@@ -294,6 +294,10 @@ body.body--scheduling .container {
     align-items: flex-start;
 }
 
+body.body--date-confirmed .container {
+    align-items: flex-start;
+}
+
 .card--scheduling {
     width: min(460px, 100%);
     max-width: 100%;
@@ -495,9 +499,14 @@ body.body--scheduling .container {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    visibility: visible;
     transition:
         opacity 0.45s ease,
         transform 0.45s ease;
+}
+
+.calendar-actions[hidden] {
+    display: none !important;
 }
 
 .calendar-actions--visible {

@@ -24,13 +24,12 @@ const googleCalendarLink = document.getElementById("googleCalendarLink");
 const NO_CLICKS_BEFORE_ANIMAL = 5;
 
 const NO_PERSUASION_MESSAGES = [
-    "Are you sure? I had the cutest date planned... 🥺",
-    "Come on, it'll be fun! Pinky promise? 🤞",
-    "I'll bring snacks. The good kind. 🍫",
-    "Look — the Yes button is right there... 👀❤️",
-    "Okay but seriously... please? 🙏",
-    "My heart can't take another No... 💔",
-    "Fine, keep clicking No — but Yes is getting HUGE! 😄",
+    "确定吗？我可是准备了一个超级浪漫的约会... 🥺",
+    "来吧，肯定很好玩！我保证！ 🤞",
+    "我会带一些好吃的零食。🍫",
+    "看，愿意的按钮就在那里... 👀❤️",
+    "我的心不能承受另一个不愿意... 💔",
+    "好吧，继续点击不愿意 — 但是愿意的按钮已经变得超级大了！ 😄",
 ];
 const YES_GROWTH_PER_CLICK = 0.22;
 const BASE_YES_FONT_SIZE = 16;
@@ -38,13 +37,13 @@ const BASE_YES_PADDING_Y = 12;
 const BASE_YES_PADDING_X = 25;
 
 const HAPPY_HEADLINE = "Yay!! 🎉";
-const HAPPY_SUBTITLE = "I'm so happy you agreed to go out with me!";
-const DATE_PICKER_HEADLINE = "Let's plan it!";
-const DATE_PICKER_SUBTITLE = "Choose the perfect day for our date.";
-const DATE_CONFIRMED_HEADLINE = "It's a date! 💖";
-const DATE_CONFIRMED_SUBTITLE = "I can't wait to see you on";
-const CALENDAR_EVENT_TITLE = "Our Date 💕";
-const CALENDAR_EVENT_DESCRIPTION = "Our special date together. Can't wait!";
+const HAPPY_SUBTITLE = "我太开心了，你愿意和我一起去约会！";
+const DATE_PICKER_HEADLINE = "让我们计划一下吧！";
+const DATE_PICKER_SUBTITLE = "选择一个最适合我们的日期。";
+const DATE_CONFIRMED_HEADLINE = "是约会！ 💖";
+const DATE_CONFIRMED_SUBTITLE = "我等不及要见到你了";
+const CALENDAR_EVENT_TITLE = "我们的约会 💕";
+const CALENDAR_EVENT_DESCRIPTION = "我们的特别约会。等不及了！";
 const CALENDAR_EVENT_START_HOUR = 19;
 const CALENDAR_EVENT_END_HOUR = 21;
 
@@ -210,11 +209,15 @@ async function addToPhoneCalendar(date) {
 }
 
 function showCalendarActions(date) {
-    googleCalendarLink.href = getGoogleCalendarUrl(date);
+    if (googleCalendarLink) {
+        googleCalendarLink.href = getGoogleCalendarUrl(date);
+    }
+
     calendarActions.hidden = false;
 
     window.requestAnimationFrame(() => {
         calendarActions.classList.add("calendar-actions--visible");
+        addToCalendarButton.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
 }
 
@@ -327,6 +330,7 @@ function confirmSelectedDate() {
     datePicker.classList.remove("date-picker--visible");
     card.classList.remove("card--scheduling");
     document.body.classList.remove("body--scheduling");
+    document.body.classList.add("body--date-confirmed");
     card.classList.add("card--date-confirmed");
 
     headline.textContent = DATE_CONFIRMED_HEADLINE;
