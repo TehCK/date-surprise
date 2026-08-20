@@ -1,0 +1,902 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    font-family: Arial, sans-serif;
+
+    background:
+        radial-gradient(circle at top left, #ffd6e8, transparent 40%),
+        radial-gradient(circle at bottom right, #d8d9ff, transparent 40%),
+        linear-gradient(135deg, #fce4ec, #e8eaf6);
+}
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding:
+        max(20px, env(safe-area-inset-top))
+        max(20px, env(safe-area-inset-right))
+        max(20px, env(safe-area-inset-bottom))
+        max(20px, env(safe-area-inset-left));
+}
+
+.card {
+    width: min(420px, 100%);
+    max-width: 100%;
+    margin: auto;
+
+    padding: 30px;
+
+    text-align: center;
+
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.12);
+
+    animation: appear 0.8s ease;
+    overflow-x: hidden;
+}
+
+.card--celebrating {
+    animation: celebrateCard 0.8s ease;
+    box-shadow:
+        0 20px 50px rgba(255, 107, 154, 0.18),
+        0 0 0 1px rgba(255, 107, 154, 0.08);
+}
+
+.photo {
+    display: block;
+    width: min(260px, 100%);
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    margin-inline: auto;
+
+    object-fit: cover;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.15);
+
+    margin-bottom: 25px;
+
+    transition:
+        opacity 0.35s ease,
+        transform 0.5s ease,
+        box-shadow 0.5s ease;
+}
+
+.photo--swapping {
+    opacity: 0;
+    transform: scale(0.96) rotate(-2deg);
+}
+
+.photo--happy {
+    transform: scale(1.02);
+    box-shadow:
+        0 14px 34px rgba(255, 107, 154, 0.25),
+        0 0 0 4px rgba(255, 107, 154, 0.08);
+}
+
+h1,
+.subtitle {
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
+}
+
+.celebration-text--changing {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.celebration-text--shown {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card--celebrating h1 {
+    color: #ff4f86;
+}
+
+.card--celebrating .subtitle {
+    color: #555;
+    font-size: 19px;
+    line-height: 1.5;
+}
+
+h1 {
+    margin: 5px 0 10px;
+
+    font-size: 26px;
+    color: #333;
+
+    overflow-wrap: anywhere;
+}
+
+.subtitle {
+    margin-bottom: 25px;
+
+    font-size: 18px;
+    color: #666;
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+.buttons {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    max-width: 100%;
+    min-height: 56px;
+    max-height: none;
+    padding: 8px 0;
+    overflow: visible;
+
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease,
+        max-height 0.45s ease,
+        padding 0.45s ease;
+}
+
+button {
+    border: none;
+
+    border-radius: 999px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        font-size 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        padding 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.2s ease,
+        opacity 0.4s ease;
+}
+
+.yes-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+}
+
+.no-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+}
+
+.yes-button {
+    --yes-scale: 1;
+    --yes-font-size: 16px;
+    --yes-padding-y: 12px;
+    --yes-padding-x: 25px;
+
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+
+    padding: var(--yes-padding-y) var(--yes-padding-x);
+    font-size: var(--yes-font-size);
+
+    background: #ff6b9a;
+    color: white;
+
+    box-shadow: 0 8px 20px rgba(255, 107, 154, 0.3);
+}
+
+.yes-button.yes-growing {
+    box-shadow:
+        0 12px 28px rgba(255, 107, 154, 0.45),
+        0 0 0 6px rgba(255, 107, 154, 0.15);
+}
+
+.yes-button.yes-celebrate {
+    animation: yesCelebrate 0.7s ease;
+}
+
+.no-button-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    max-width: 100%;
+}
+
+.no-persuasion {
+    margin: 0;
+    max-width: 220px;
+
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.45;
+    color: #ff4f86;
+
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.no-persuasion--visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.no-button {
+    --no-scale: 1;
+    --no-font-size: 16px;
+    --no-padding-y: 12px;
+    --no-padding-x: 25px;
+
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+
+    padding: var(--no-padding-y) var(--no-padding-x);
+    font-size: var(--no-font-size);
+
+    background: #eeeeee;
+    color: #555;
+}
+
+.no-button--nudged {
+    animation: noNudge 0.45s ease;
+}
+
+.yes-button--hint {
+    animation: yesHint 0.45s ease;
+}
+
+.no-button--grabbed {
+    z-index: 3;
+    pointer-events: none;
+    animation: noGrabbed 2.4s ease forwards;
+}
+
+.no-button--gone {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.body--scheduling .container {
+    align-items: flex-start;
+}
+
+.card--scheduling {
+    width: min(460px, 100%);
+    max-width: 100%;
+}
+
+.card--date-confirmed h1 {
+    color: #ff4f86;
+}
+
+.card--date-confirmed .subtitle {
+    color: #555;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.celebration-actions {
+    opacity: 0;
+    transform: translateY(10px);
+    margin-top: 4px;
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease;
+}
+
+.celebration-actions--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.continue-button {
+    padding: 12px 28px;
+    font-size: 16px;
+    color: white;
+    background: linear-gradient(135deg, #ff6b9a, #ff8fab);
+    box-shadow: 0 8px 20px rgba(255, 107, 154, 0.3);
+}
+
+.continue-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+}
+
+.date-picker {
+    opacity: 0;
+    transform: translateY(12px);
+    margin-top: 8px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease;
+}
+
+.date-picker--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.date-picker__label {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ff4f86;
+}
+
+.calendar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 0 0 1px rgba(255, 107, 154, 0.12);
+}
+
+.calendar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.calendar__month {
+    font-size: 17px;
+    font-weight: bold;
+    color: #444;
+    min-width: 0;
+    padding: 0 6px;
+    text-align: center;
+}
+
+.calendar__nav {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    color: #ff6b9a;
+    background: rgba(255, 107, 154, 0.12);
+}
+
+.calendar__nav:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.calendar__nav:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.calendar__weekdays,
+.calendar__days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+}
+
+.calendar__weekdays {
+    margin-bottom: 8px;
+}
+
+.calendar__weekdays span {
+    font-size: 12px;
+    font-weight: bold;
+    color: #999;
+}
+
+.calendar__day {
+    aspect-ratio: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.calendar__day:hover:not(:disabled) {
+    transform: translateY(-2px);
+    color: #ff4f86;
+    background: rgba(255, 107, 154, 0.1);
+}
+
+.calendar__day--empty {
+    pointer-events: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.calendar__day--disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.calendar__day--today {
+    box-shadow: inset 0 0 0 2px rgba(255, 107, 154, 0.35);
+}
+
+.calendar__day--selected {
+    color: white;
+    background: linear-gradient(135deg, #ff6b9a, #ff8fab);
+    box-shadow: 0 6px 16px rgba(255, 107, 154, 0.35);
+}
+
+.selected-date-text {
+    min-height: 24px;
+    margin: 16px 0 12px;
+    font-size: 15px;
+    color: #666;
+}
+
+.confirm-date-button {
+    padding: 12px 24px;
+    font-size: 15px;
+    color: white;
+    background: #7b8cff;
+    box-shadow: 0 8px 20px rgba(123, 140, 255, 0.28);
+}
+
+.confirm-date-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+}
+
+.confirm-date-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.calendar-actions {
+    opacity: 0;
+    transform: translateY(12px);
+    margin-top: 18px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease;
+}
+
+.calendar-actions--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.calendar-actions__hint {
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #666;
+}
+
+.add-to-calendar-button {
+    width: 100%;
+    padding: 13px 24px;
+    font-size: 16px;
+    color: white;
+    background: linear-gradient(135deg, #ff6b9a, #ff8fab);
+    box-shadow: 0 8px 20px rgba(255, 107, 154, 0.3);
+}
+
+.add-to-calendar-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+}
+
+.calendar-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #7b8cff;
+    text-decoration: none;
+}
+
+.calendar-link:hover {
+    text-decoration: underline;
+}
+
+.buttons--celebrating {
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    max-height: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease,
+        max-height 0.45s ease;
+}
+
+.fireworks {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: 100vw;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.fireworks--active {
+    opacity: 1;
+}
+
+.animal-helper {
+    --cat-target-left: 50%;
+
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: 100vw;
+    pointer-events: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.animal-helper__pet {
+    position: absolute;
+    left: -120px;
+    bottom: 18%;
+    font-size: 72px;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+    transform: scaleX(-1);
+}
+
+.animal-helper__bubble {
+    position: absolute;
+    left: 40px;
+    bottom: calc(18% + 78px);
+
+    padding: 8px 14px;
+    border-radius: 16px;
+
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    white-space: nowrap;
+
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+}
+
+.animal-helper__bubble::after {
+    content: "";
+    position: absolute;
+    left: 24px;
+    bottom: -8px;
+
+    border-width: 8px 8px 0 8px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+}
+
+.animal-helper--active .animal-helper__pet {
+    animation: catRescue 2.8s ease forwards;
+}
+
+.animal-helper--active .animal-helper__bubble {
+    animation: bubblePop 2.8s ease forwards;
+}
+
+.buttons--animal-scene .yes-button {
+    animation: yesCheer 0.6s ease 1.8s;
+}
+
+@keyframes celebrateCard {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes noNudge {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    20% {
+        transform: translate(-4px, 0) rotate(-3deg);
+    }
+
+    40% {
+        transform: translate(4px, 0) rotate(3deg);
+    }
+
+    60% {
+        transform: translate(-3px, 0) rotate(-2deg);
+    }
+
+    80% {
+        transform: translate(2px, 0) rotate(1deg);
+    }
+}
+
+@keyframes yesHint {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 8px 20px rgba(255, 107, 154, 0.3);
+    }
+
+    50% {
+        transform: translateY(-4px) scale(1.04);
+        box-shadow:
+            0 14px 28px rgba(255, 107, 154, 0.45),
+            0 0 0 5px rgba(255, 107, 154, 0.12);
+    }
+}
+
+@keyframes yesCelebrate {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    35% {
+        transform: translateY(-5px) rotate(-4deg) scale(1.06);
+    }
+
+    70% {
+        transform: translateY(-3px) rotate(4deg) scale(1.03);
+    }
+}
+
+@keyframes noGrabbed {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    18% {
+        transform: translate(0, -8px) rotate(-6deg);
+    }
+
+    35% {
+        transform: translate(40px, -12px) rotate(8deg) scale(0.95);
+    }
+
+    55% {
+        transform: translate(80px, -6px) rotate(-4deg) scale(0.92);
+    }
+
+    100% {
+        transform: translate(140vw, -20px) rotate(18deg) scale(0.75);
+        opacity: 0;
+    }
+}
+
+@keyframes catRescue {
+    0% {
+        left: -120px;
+        transform: scaleX(-1) translateY(0) rotate(0deg);
+    }
+
+    18% {
+        left: 8%;
+        transform: scaleX(-1) translateY(-6px) rotate(-8deg);
+    }
+
+    35% {
+        left: var(--cat-target-left);
+        transform: scaleX(-1) translateY(-10px) rotate(6deg);
+    }
+
+    55% {
+        left: calc(var(--cat-target-left) + 20px);
+        transform: scaleX(-1) translateY(-4px) rotate(-4deg);
+    }
+
+    100% {
+        left: 110vw;
+        transform: scaleX(-1) translateY(-16px) rotate(10deg);
+    }
+}
+
+@keyframes bubblePop {
+    0%, 12% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.9);
+    }
+
+    20%, 48% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    58%, 100% {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.95);
+    }
+}
+
+@keyframes yesCheer {
+    0%, 100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.08);
+        box-shadow:
+            0 16px 34px rgba(255, 107, 154, 0.5),
+            0 0 0 8px rgba(255, 107, 154, 0.12);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding:
+            max(12px, env(safe-area-inset-top))
+            max(12px, env(safe-area-inset-right))
+            max(12px, env(safe-area-inset-bottom))
+            max(12px, env(safe-area-inset-left));
+    }
+
+    .card {
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+
+    .photo {
+        width: min(220px, 100%);
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .card--celebrating .subtitle,
+    .card--date-confirmed .subtitle {
+        font-size: 17px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        gap: 12px;
+        max-height: none;
+    }
+
+    .no-persuasion {
+        max-width: 100%;
+        font-size: 12px;
+    }
+
+    .yes-button,
+    .no-button,
+    .continue-button,
+    .confirm-date-button,
+    .add-to-calendar-button {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .calendar {
+        padding: 10px;
+    }
+
+    .calendar__header {
+        margin-bottom: 10px;
+    }
+
+    .calendar__month {
+        font-size: 15px;
+    }
+
+    .calendar__nav {
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .calendar__weekdays,
+    .calendar__days {
+        gap: 4px;
+    }
+
+    .calendar__weekdays span {
+        font-size: 10px;
+    }
+
+    .calendar__day {
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .date-picker__label {
+        font-size: 15px;
+    }
+
+    .selected-date-text {
+        font-size: 14px;
+    }
+
+    .calendar-actions__hint {
+        font-size: 13px;
+    }
+
+    .animal-helper__pet {
+        font-size: 56px;
+        bottom: 14%;
+    }
+
+    .animal-helper__bubble {
+        left: 16px;
+        right: 16px;
+        bottom: calc(14% + 62px);
+        font-size: 12px;
+        max-width: none;
+        white-space: normal;
+    }
+}
