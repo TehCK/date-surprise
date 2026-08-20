@@ -543,7 +543,20 @@ body.body--date-confirmed .container {
     text-decoration: none;
 }
 
-.calendar-link:hover {
+.calendar-link--fallback {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #7b8cff;
+    text-decoration: none;
+}
+
+.calendar-link--fallback[hidden] {
+    display: none;
+}
+
+.calendar-link--fallback:hover {
     text-decoration: underline;
 }
 

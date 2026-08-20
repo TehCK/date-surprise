@@ -101,7 +101,7 @@
             </div>
 
             <div id="calendarActions" class="calendar-actions" hidden>
-                <p class="calendar-actions__hint">
+                <p id="calendarActionsHint" class="calendar-actions__hint">
                     将我们的约会保存到你的手机日历中（晚上7:00 - 晚上9:00）。
                 </p>
 
@@ -112,6 +112,15 @@
                 >
                     添加到日历 📅
                 </button>
+
+                <a
+                    id="icsOpenLink"
+                    class="calendar-link calendar-link--fallback"
+                    href="#"
+                    hidden
+                >
+                    如果上方按钮无效，请点这里
+                </a>
             </div>
 
         </div>

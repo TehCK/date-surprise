@@ -18,8 +18,12 @@ const nextMonthButton = document.getElementById("nextMonthButton");
 const selectedDateText = document.getElementById("selectedDateText");
 const confirmDateButton = document.getElementById("confirmDateButton");
 const calendarActions = document.getElementById("calendarActions");
+const calendarActionsHint = document.getElementById("calendarActionsHint");
 const addToCalendarButton = document.getElementById("addToCalendarButton");
+const icsOpenLink = document.getElementById("icsOpenLink");
 const googleCalendarLink = document.getElementById("googleCalendarLink");
+
+let icsObjectUrl = null;
 
 const NO_CLICKS_BEFORE_ANIMAL = 5;
 
@@ -126,6 +130,11 @@ function formatIcsUtcStamp(date) {
     return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
+function isIOSDevice() {
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
 function buildIcsContent(date) {
     const uid = `${date.getTime()}-date@simpleweb`;
     const dtStamp = formatIcsUtcStamp(new Date());
@@ -145,11 +154,20 @@ function buildIcsContent(date) {
         `DTEND:${dtEnd}`,
         `SUMMARY:${escapeIcsText(CALENDAR_EVENT_TITLE)}`,
         `DESCRIPTION:${escapeIcsText(CALENDAR_EVENT_DESCRIPTION)}`,
+        "STATUS:CONFIRMED",
+        "SEQUENCE:0",
+        "TRANSP:OPAQUE",
         "END:VEVENT",
         "END:VCALENDAR",
     ];
 
     return `${lines.join("\r\n")}\r\n`;
+}
+
+function createIcsBlob(date) {
+    return new Blob([buildIcsContent(date)], {
+        type: "text/calendar;charset=utf-8",
+    });
 }
 
 function createIcsFile(date) {
@@ -160,9 +178,21 @@ function createIcsFile(date) {
     );
 }
 
+function revokeIcsObjectUrl() {
+    if (icsObjectUrl) {
+        URL.revokeObjectURL(icsObjectUrl);
+        icsObjectUrl = null;
+    }
+}
+
+function getIcsObjectUrl(date) {
+    revokeIcsObjectUrl();
+    icsObjectUrl = URL.createObjectURL(createIcsBlob(date));
+    return icsObjectUrl;
+}
+
 function downloadIcsFile(date) {
-    const icsFile = createIcsFile(date);
-    const url = URL.createObjectURL(icsFile);
+    const url = getIcsObjectUrl(date);
     const link = document.createElement("a");
 
     link.href = url;
@@ -170,7 +200,47 @@ function downloadIcsFile(date) {
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(url);
+}
+
+function openIcsDirectly(date) {
+    const url = getIcsObjectUrl(date);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function updateCalendarActionHint() {
+    if (!calendarActionsHint) {
+        return;
+    }
+
+    if (window.location.protocol === "file:") {
+        calendarActionsHint.textContent =
+            "请通过网址（HTTPS）打开此页面，才能添加到 iPhone 日历。";
+        return;
+    }
+
+    if (isIOSDevice()) {
+        calendarActionsHint.textContent =
+            "点击下方按钮，在分享菜单中选择「日历」，然后点「添加」。";
+        return;
+    }
+
+    calendarActionsHint.textContent =
+        "将我们的约会保存到你的手机日历中（晚上7:00 - 晚上9:00）。";
+}
+
+function prepareIcsFallbackLink(date) {
+    if (!icsOpenLink) {
+        return;
+    }
+
+    icsOpenLink.href = getIcsObjectUrl(date);
+    icsOpenLink.hidden = !isIOSDevice();
 }
 
 function getGoogleCalendarUrl(date) {
@@ -187,21 +257,31 @@ function getGoogleCalendarUrl(date) {
 }
 
 async function addToPhoneCalendar(date) {
+    if (window.location.protocol === "file:") {
+        window.alert("请通过网址打开此页面（不要直接打开文件），才能添加到 iPhone 日历。");
+        return false;
+    }
+
     const icsFile = createIcsFile(date);
 
-    if (navigator.canShare && navigator.canShare({ files: [icsFile] })) {
+    if (navigator.share) {
         try {
-            await navigator.share({
-                files: [icsFile],
-                title: CALENDAR_EVENT_TITLE,
-                text: CALENDAR_EVENT_DESCRIPTION,
-            });
-            return true;
+            const shareData = { files: [icsFile] };
+
+            if (!navigator.canShare || navigator.canShare(shareData)) {
+                await navigator.share(shareData);
+                return true;
+            }
         } catch (error) {
             if (error.name === "AbortError") {
                 return false;
             }
         }
+    }
+
+    if (isIOSDevice()) {
+        openIcsDirectly(date);
+        return true;
     }
 
     downloadIcsFile(date);
@@ -213,6 +293,8 @@ function showCalendarActions(date) {
         googleCalendarLink.href = getGoogleCalendarUrl(date);
     }
 
+    updateCalendarActionHint();
+    prepareIcsFallbackLink(date);
     calendarActions.hidden = false;
 
     window.requestAnimationFrame(() => {
@@ -339,10 +421,6 @@ function confirmSelectedDate() {
     window.setTimeout(() => {
         datePicker.hidden = true;
         showCalendarActions(dateToConfirm);
-
-        window.setTimeout(() => {
-            addToPhoneCalendar(dateToConfirm);
-        }, 500);
     }, 350);
 }
 
@@ -652,3 +730,16 @@ addToCalendarButton.addEventListener("click", () => {
         addToPhoneCalendar(confirmedDate);
     }
 });
+
+if (icsOpenLink) {
+    icsOpenLink.addEventListener("click", (event) => {
+        if (!confirmedDate) {
+            event.preventDefault();
+            return;
+        }
+
+        prepareIcsFallbackLink(confirmedDate);
+    });
+}
+
+window.addEventListener("pagehide", revokeIcsObjectUrl);
